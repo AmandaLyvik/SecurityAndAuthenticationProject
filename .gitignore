@@ -1,0 +1,58 @@
+# Build artifacts
+bin/
+obj/
+out/
+*.log
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# VS Code settings
+.vscode/
+*.code-workspace
+
+# Rider settings
+.idea/
+
+# ASP.NET secrets
+secrets.json
+*.pfx
+
+# .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Test results
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+# NuGet packages
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+*.nuspec
+
+# Entity Framework
+Migrations/
+
+# Others
+*.DS_Store
+Thumbs.db
+*.vspscc
+*.vssscc
+*.orig
+
+# Git folder
+.git/
+
+# Auto-generated files
+Generated_Code/
+
+wwwroot/

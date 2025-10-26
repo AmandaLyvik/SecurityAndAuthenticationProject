@@ -1,0 +1,49 @@
+@model UserInput
+@{
+    var users = ViewData["Users"] as List<User>;
+}
+
+<form asp-action="Submit" method="post">
+    <label asp-for="Username"></label>
+    <input asp-for="Username" />
+    
+    <label asp-for="Email"></label>
+    <input asp-for="Email" type="email" />
+    
+    <button type="submit">Submit</button>
+</form>
+
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="validation-summary-errors" style="color: red;">
+        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+        {
+            <p>@error.ErrorMessage</p>
+        }
+    </div>
+}
+
+<h3>📋 Submitted Users</h3>
+<table>
+    <thead>
+        <tr>
+            <th>UserID</th>
+            <th>Username</th>
+            <th>Email</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (users != null)
+        {
+            foreach (var user in users)
+            {
+                <tr>
+                    <td>@user.UserID</td>
+                    <td>@user.Username</td>
+                    <td>@user.Email</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

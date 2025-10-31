@@ -10,7 +10,7 @@ namespace FinalProject.Tests
         [SetUp]
         public void Setup()
         {
-            Console.WriteLine("\nTest setup starting...");
+            Console.WriteLine("\nTestInputValidation setup starting...");
         }
 
         [Test]

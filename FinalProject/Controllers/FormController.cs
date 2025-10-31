@@ -34,7 +34,7 @@ namespace FinalProject.Controllers
                 return View("Index", input);
             }
 
-            _authService.StoreUser(input.Username, input.Email);
+            _authService.StoreUser(input);
             ModelState.Clear();
             ViewData["Users"] = _authService.GetAllUsers();
             return View("Index", new UserInput());

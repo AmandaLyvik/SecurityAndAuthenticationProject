@@ -1,26 +1,47 @@
 using Microsoft.Data.Sqlite;
 using FinalProject.Helpers;
+using FinalProject.Models;
 
 namespace FinalProject.Services
 {
     public class AuthService
     {
-        private readonly string _connectionString = "Data Source=FinalProject.db";
+        private readonly string _connectionString;
 
-        public bool StoreUser(string username, string email)
+        public AuthService(string connectionString)
         {
-            const string query = "INSERT INTO Users (Username, Email) VALUES (@Username, @Email)";
+            _connectionString = connectionString;
+        }
+
+        public bool StoreUser(UserInput input)
+        {
+            const string query = "INSERT INTO Users (Username, Email, PasswordHash) VALUES (@Username, @Email, @PasswordHash)";
+
+            var passwordHash = PasswordHelper.HashPassword(input.Password);
 
             using (var connection = new SqliteConnection(_connectionString))
             using (var command = new SqliteCommand(query, connection))
             {
-                command.Parameters.AddWithValue("@Username", username);
-                command.Parameters.AddWithValue("@Email", email);
+                command.Parameters.AddWithValue("@Username", input.Username);
+                command.Parameters.AddWithValue("@Email", input.Email);
+                command.Parameters.AddWithValue("@PasswordHash", passwordHash);
 
                 connection.Open();
                 command.ExecuteNonQuery();
                 return true;
             }
+
+            /* Using EF Core
+            var user = new User
+            {
+                Username = input.Username,
+                Email = input.Email,
+                PasswordHash = passwordHash
+            };
+            _context.Users.Add(user);
+            _context.SaveChanges();
+            return true;
+            */
         }
 
         public List<User> GetAllUsers()
@@ -46,5 +67,24 @@ namespace FinalProject.Services
 
             return users;
         }
+
+        public bool AuthenticateUser(string username, string password)
+        {
+            const string query = "SELECT PasswordHash FROM Users WHERE Username = @Username";
+
+            using var connection = new SqliteConnection(_connectionString);
+            using var command = new SqliteCommand(query, connection);
+            command.Parameters.AddWithValue("@Username", username);
+
+            connection.Open();
+            var result = command.ExecuteScalar();
+
+            if (result == null || result == DBNull.Value)
+                return false;
+
+            var storedHash = result.ToString();
+            return PasswordHelper.VerifyPassword(password, storedHash);
+        }
+
     }
 }

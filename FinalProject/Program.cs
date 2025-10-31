@@ -8,7 +8,8 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite("Data Source=FinalProject.db"));
-builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<AuthService>(provider =>
+    new AuthService("Data Source=FinalProject.db"));
 
 var app = builder.Build();
 

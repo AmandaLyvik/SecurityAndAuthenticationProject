@@ -15,7 +15,7 @@ namespace FinalProject.Controllers
         }
 
 
-        [HttpGet("/")]
+        [HttpGet("/form")]
         public IActionResult Index()
         {
             var users = _authService.GetAllUsers();
@@ -23,8 +23,8 @@ namespace FinalProject.Controllers
             return View(new UserInput());
         }
 
-        [HttpPost("/")]
-        public IActionResult Submit(UserInput input)
+        [HttpPost("/form")]
+        public IActionResult Submit(UserInput input, string action)
         {
             if (!InputValidator.IsValidInput(input.Username, "@#$") ||
                 !InputValidator.IsValidInput(input.Email, "@._"))
@@ -34,10 +34,29 @@ namespace FinalProject.Controllers
                 return View("Index", input);
             }
 
-            _authService.StoreUser(input);
-            ModelState.Clear();
+            if (action == "register")
+            {
+                _authService.StoreUser(input, role: "User");
+                ModelState.Clear();
+                ViewData["Users"] = _authService.GetAllUsers();
+                return View("Index", new UserInput());
+            }
+            else if (action == "login")
+            {
+                if (_authService.AuthenticateUser(input.Username, input.Password))
+                {
+                    HttpContext.Session.SetString("Username", input.Username);
+                    return RedirectToAction("Index", "Home");
+                }
+
+                ModelState.AddModelError("", "Invalid credentials");
+                ViewData["Users"] = _authService.GetAllUsers();
+                return View("Index", input);
+            }
+
+            ModelState.AddModelError("", "Unknown action.");
             ViewData["Users"] = _authService.GetAllUsers();
-            return View("Index", new UserInput());
+            return View("Index", input);
         }
     }
 }

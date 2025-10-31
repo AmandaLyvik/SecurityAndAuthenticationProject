@@ -13,9 +13,25 @@ public class HomeController : Controller
         _logger = logger;
     }
 
+    [HttpGet("/")]
     public IActionResult Index()
     {
+        var username = HttpContext.Session.GetString("Username");
+        ViewData["Username"] = username;
         return View();
+    }
+
+    [HttpPost("/")]
+    public IActionResult Logout(string action)
+    {
+        if (action == "logout")
+        {
+            HttpContext.Session.Clear();
+        }
+
+        var username = HttpContext.Session.GetString("Username");
+        ViewData["Username"] = username;
+        return View("Index");
     }
 
     public IActionResult Privacy()

@@ -1,8 +1,25 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
+    var username = ViewData["Username"] as string;
 }
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
+
+@if (!string.IsNullOrEmpty(username))
+{
+    <p>Welcome, @username!</p>
+}
+else
+{
+    <p>Welcome, guest!</p>
+}
+
+@if (!string.IsNullOrEmpty(username))
+{
+    <form asp-action="Logout" method="post">
+        <button type="submit" name="action" value="logout">Logout</button>
+    </form>
+}

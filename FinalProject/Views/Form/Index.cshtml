@@ -3,6 +3,7 @@
     var users = ViewData["Users"] as List<User>;
 }
 
+<h2>Login or register new user</h2>
 <form asp-action="Submit" method="post">
     <label asp-for="Username"></label>
     <input asp-for="Username" />
@@ -13,7 +14,8 @@
     <label asp-for="Password"></label>
     <input asp-for="Password" type="password" />
     
-    <button type="submit">Submit</button>
+    <button type="submit" name="action" value="register">Register</button>
+    <button type="submit" name="action" value="login">Login</button>
 </form>
 
 
@@ -27,7 +29,7 @@
     </div>
 }
 
-<h3>📋 Submitted Users</h3>
+<h3>📋 Registered Users</h3>
 <table>
     <thead>
         <tr>

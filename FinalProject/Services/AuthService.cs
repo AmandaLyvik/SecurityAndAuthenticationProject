@@ -13,9 +13,9 @@ namespace FinalProject.Services
             _connectionString = connectionString;
         }
 
-        public bool StoreUser(UserInput input)
+        public bool StoreUser(UserInput input, string role = "User")
         {
-            const string query = "INSERT INTO Users (Username, Email, PasswordHash) VALUES (@Username, @Email, @PasswordHash)";
+            const string query = "INSERT INTO Users (Username, Email, PasswordHash, Role) VALUES (@Username, @Email, @PasswordHash, @Role)";
 
             var passwordHash = PasswordHelper.HashPassword(input.Password);
 
@@ -25,7 +25,8 @@ namespace FinalProject.Services
                 command.Parameters.AddWithValue("@Username", input.Username);
                 command.Parameters.AddWithValue("@Email", input.Email);
                 command.Parameters.AddWithValue("@PasswordHash", passwordHash);
-
+                command.Parameters.AddWithValue("@Role", role);
+                
                 connection.Open();
                 command.ExecuteNonQuery();
                 return true;
@@ -84,6 +85,24 @@ namespace FinalProject.Services
 
             var storedHash = result.ToString();
             return PasswordHelper.VerifyPassword(password, storedHash);
+        }
+
+        public bool IsUserAdmin(string username)
+        {
+            const string query = "SELECT Role FROM Users WHERE Username = @Username";
+
+            using var connection = new SqliteConnection(_connectionString);
+            using var command = new SqliteCommand(query, connection);
+            command.Parameters.AddWithValue("@Username", username);
+
+            connection.Open();
+            var result = command.ExecuteScalar();
+
+            if (result == null || result == DBNull.Value)
+                return false;
+
+            var role = result.ToString();
+            return role == "Admin";
         }
 
     }

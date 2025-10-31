@@ -13,25 +13,31 @@ namespace FinalProject.Tests
     {
         private AppDbContext _context;
         private AuthService _authService;
+        private SqliteConnection _connection;
 
         [SetUp]
         public void Setup()
         {
             Console.WriteLine("\nTestInputValidation setup starting...");
 
-            var connectionString = "Data Source=:memory"; // or use a file-based test DB
+            var connectionString = "Data Source=:memory"; 
             _authService = new AuthService(connectionString);
 
-            using var connection = new SqliteConnection(connectionString);
-            connection.Open();
+            _connection = new SqliteConnection(connectionString);
+            _connection.Open();
 
-            var createTable = connection.CreateCommand();
+            var dropTable = _connection.CreateCommand();
+            dropTable.CommandText = "DROP TABLE IF EXISTS Users;";
+            dropTable.ExecuteNonQuery();
+
+            var createTable = _connection.CreateCommand();
             createTable.CommandText = @"
-                CREATE TABLE IF NOT EXISTS Users (
+                CREATE TABLE Users (
                     UserID INTEGER PRIMARY KEY AUTOINCREMENT,
                     Username TEXT NOT NULL,
                     Email TEXT NOT NULL,
-                    PasswordHash TEXT NOT NULL
+                    PasswordHash TEXT NOT NULL,
+                    Role TEXT NOT NULL
                 );";
             createTable.ExecuteNonQuery();
         }
@@ -49,7 +55,7 @@ namespace FinalProject.Tests
                 Password = "Secure123!"
             };
 
-            _authService.StoreUser(input);
+            _authService.StoreUser(input, role: "User");
 
             Assert.That(_authService.AuthenticateUser(input.Username, input.Password), Is.True, "User should be authenticated with correct password.");
             Assert.That(_authService.AuthenticateUser(input.Username, "WrongPassword"), Is.False, "Authentication should fail with incorrect password.");
@@ -60,6 +66,7 @@ namespace FinalProject.Tests
         [TearDown]
         public void Teardown()
         {
+            _connection?.Dispose();
             Console.WriteLine("✅ Test finished.");
         }
     }
